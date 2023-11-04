@@ -1,5 +1,5 @@
 import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Ankou from "./Ankou";
 import LampPost from "./LampPost";
 import Rock from "./Rock";
@@ -7,6 +7,7 @@ import TreeSpruce from "./TreeSpruce";
 import YoungKorrigan from "./YoungKorrigan";
 import { useFrame } from "@react-three/fiber";
 import { useControls } from "leva";
+import { randFloatSpread } from "three/src/math/MathUtils";
 
 const OFFSET_X = 20;
 const LAMPS_NB = 10;
@@ -17,6 +18,8 @@ const FAR_TREES_NB = 12;
 const FAR_TREES_SPEED = 0.08;
 const ROCKS_NB = 6;
 const ROCKS_SPEED = 0.5;
+const RANDOMIZER_STRENGTH_SCALE = 0.42;
+const RANDOMIZER_STRENGTH_POSITION = 1;
 
 const MovingItem = (props) => {
   const ref = useRef();
@@ -26,6 +29,18 @@ const MovingItem = (props) => {
 
     if (ref.current.position.x >= OFFSET_X) {
       ref.current.position.x = -OFFSET_X;
+    }
+  });
+
+  useEffect(() => {
+    if (props.randomizePosition) {
+      ref.current.position.x += randFloatSpread(RANDOMIZER_STRENGTH_POSITION);
+      ref.current.position.z += randFloatSpread(RANDOMIZER_STRENGTH_POSITION);
+    }
+    if (props.randomizeScale) {
+      ref.current.scale.x += randFloatSpread(RANDOMIZER_STRENGTH_SCALE);
+      ref.current.scale.y += randFloatSpread(RANDOMIZER_STRENGTH_SCALE);
+      ref.current.scale.z += randFloatSpread(RANDOMIZER_STRENGTH_SCALE);
     }
   });
 
@@ -116,6 +131,8 @@ const Background = () => {
           key={index}
           speed={treesSpeed}
           position={[-OFFSET_X + (index / treesNb) * OFFSET_X * 2, 0, -3.5]}
+          randomizePosition
+          randomizeScale
         >
           <TreeSpruce scale={[0.1, 0.1, 0.1]} />
         </MovingItem>
@@ -126,6 +143,8 @@ const Background = () => {
           key={index}
           speed={farTreesSpeed}
           position={[-OFFSET_X + (index / farTreesNb) * OFFSET_X * 2, 0, -6]}
+          randomizePosition
+          randomizeScale
         >
           <TreeSpruce scale={[0.15, 0.15, 0.15]} />
         </MovingItem>
@@ -136,6 +155,7 @@ const Background = () => {
           key={index}
           speed={rocksSpeed}
           position={[-OFFSET_X + (index / rocksNb) * OFFSET_X * 2, 0, 1]}
+          randomizeScale
         >
           <Rock scale={[0.1, 0.1, 0.1]} />
         </MovingItem>
